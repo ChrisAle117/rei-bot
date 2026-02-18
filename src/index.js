@@ -4,12 +4,18 @@ const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
 
+const intents = [
+  GatewayIntentBits.Guilds,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.GuildVoiceStates
+];
+
+if (process.env.ENABLE_GUILD_MEMBERS_INTENT === "true") {
+  intents.push(GatewayIntentBits.GuildMembers);
+}
+
 const client = new Client({
-  intents: [
-    GatewayIntentBits.Guilds,
-    GatewayIntentBits.GuildMessages,
-    GatewayIntentBits.GuildMembers
-  ]
+  intents
 });
 
 client.commands = new Collection();
