@@ -1,11 +1,14 @@
 require("dotenv").config();
 const { Client, Collection, GatewayIntentBits } = require("discord.js");
+const mongoose = require("mongoose");
 const fs = require("fs");
 const path = require("path");
 
 const client = new Client({
   intents: [
-    GatewayIntentBits.Guilds
+    GatewayIntentBits.Guilds,
+    GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildMembers
   ]
 });
 
@@ -38,4 +41,20 @@ for (const file of eventFiles) {
   }
 }
 
-client.login(process.env.TOKEN);
+async function bootstrap() {
+  const mongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+
+  if (!mongoUri) {
+    throw new Error("Falta MONGO_URI o MONGODB_URI en el archivo .env");
+  }
+
+  await mongoose.connect(mongoUri);
+  console.log("MongoDB conectado.");
+
+  await client.login(process.env.TOKEN);
+}
+
+bootstrap().catch(error => {
+  console.error("Error al iniciar el bot:", error);
+  process.exit(1);
+});
